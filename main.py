@@ -49,18 +49,58 @@ def quadratic_multiply(x, y):
     return _quadratic_multiply(x,y).decimal_val
 
 def _quadratic_multiply(x, y):
-    ### TODO
-    pass
-    ###
+    #1
+    xvec = x.binary_vec
+    yvec = y.binary_vec
 
+    #2 Pad binary vectors to have the same length
+    max_len = max(len(xvec), len(yvec))
+    xvec = ['0'] * (max_len - len(xvec)) + xvec
+    yvec = ['0'] * (max_len - len(yvec)) + yvec
+
+    #3 Base case: If both x and y are <= 1, return their product
+    if len(xvec) == 1 and len(yvec) == 1:
+        return BinaryNumber([str(int(xvec[0]) * int(yvec[0]))])
+
+    #4 Split xvec and yvec into two halves
+    x_left, x_right = split_number(xvec)
+    y_left, y_right = split_number(yvec)
+
+    #5 Recursive calls for multiplication
+    xlyl = _quadratic_multiply(x_left, y_left)
+    xlyr = _quadratic_multiply(x_left, y_right)
+    xryl = _quadratic_multiply(x_right, y_left)
+    xryr = _quadratic_multiply(x_right, y_right)
+
+    #6&7 Perform additions and shifts to compute the final result
+    part1 = bit_shift(bit_shift(xlyl, len(xvec)), len(xvec))
+    part2 = bit_shift(_quadratic_multiply(x_left + x_right, y_left + y_right), len(xvec) // 2)
+    part3 = xlyr + xryl
+
+    result = part1 + part2 + part3 + xryr
+
+    return result
 
     
     
-def test_quadratic_multiply(x, y, f):
-    start = time.time()
+#def test_quadratic_multiply(x, y, f):
+  # start = time.time()
     # multiply two numbers x, y using function f
     
-    return (time.time() - start)*1000
+   # return (time.time() - start)*1000
+
+def test_multiply_1(self):
+        x = BinaryNumber(['1', '0', '1'])
+        y = BinaryNumber(['1', '1', '0'])
+        result = quadratic_multiply(x, y)
+        self.assertEqual(result, 6)  # 101 (5 in decimal) * 110 (6 in decimal) = 30 (in decimal)
+
+def test_multiply_2(self):
+        x = BinaryNumber(['1', '0', '1', '0', '0'])
+        y = BinaryNumber(['1', '1', '0', '0', '1'])
+        result = quadratic_multiply(x, y)
+        self.assertEqual(result, 52)  # 10100 (20 in decimal) * 11001 (25 in decimal) = 520 (in decimal)
+
 
 
     
